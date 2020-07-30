@@ -12,16 +12,43 @@ package com.upgrad.ublog.dto;
 
 public class UserDTO {
 
-    /*@Override
+    private int userId;
+    private String emailId;
+    private String password;
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getEmailId() {
+        return emailId;
+    }
+
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    @Override
     public String toString() {
         return "UserDTO{" +
                 "userId=" + userId +
                 ", emailId='" + emailId + '\'' +
                 ", password='" + password + '\'' +
                 '}';
-    }*/
+    }
 
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		UserDTO userDTO = new UserDTO();
 		userDTO.setUserId(1);
 		userDTO.setEmailId("dummy@dummy.com");
@@ -31,5 +58,5 @@ public class UserDTO {
 
 		 //Your output should be similar to this.
 		 //UserDTO{userId=1, emailId='dummy@dummy.com', password='password'}
-	}*/
+	}
 }
