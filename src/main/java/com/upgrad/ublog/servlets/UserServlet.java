@@ -29,6 +29,14 @@ package com.upgrad.ublog.servlets;
  * TODO: 5.6: Remove the same mapping from the Deployment Descriptor otherwise, you will get an error.
  */
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Enumeration;
+
 /**
  * TODO: 6.16. When the user click on the Sign In button on the Sign In/ Sign Up page, handle the
  *  following scenarios. (Hint: Use ServiceFactory to get UserService. Override the init() method
@@ -53,6 +61,38 @@ package com.upgrad.ublog.servlets;
  *   message stored in the exception object and display the same message on the index.jsp page.
  */
 
-public class UserServlet {
+public class UserServlet extends HttpServlet {
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession httpSession = req.getSession();
+
+        if(httpSession.getAttribute("userEmail") != null) {
+            resp.sendRedirect("/Home.jsp");
+        }
+
+        String userEmail = req.getParameter("userEmail");
+        String password = req.getParameter("password");
+        String actionType = req.getParameter("actionType");
+        //resp.getWriter().println(userEmail);
+
+
+        if(password==null|| password.isEmpty()) {
+            req.setAttribute("isError",true);
+            req.setAttribute("errorMessage","Password is a required field");
+            req.getRequestDispatcher("/index.jsp").forward(req,resp);
+            return;
+        }
+
+        if(actionType.equals("Sign In")) {
+            httpSession.setAttribute("userEmail",userEmail);
+            resp.getWriter().println(userEmail);
+            //print details
+        } else {
+            httpSession.setAttribute("userEmail",userEmail);
+            resp.getWriter().println(userEmail);
+            //print details
+        }
+    }
 }

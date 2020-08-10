@@ -13,7 +13,16 @@
 	(Hint: You need to handle NullPointerException.)
 	(Hint: Make use of the email id stored in the session object to check if user is logged in or not.)
 -->
+<%
+    try {
 
+        if(session.getAttribute("userEmail") == null) {
+                    response.sendRedirect("/index.jsp");
+                }
+    } catch(NullPointerException ex) {
+        response.sendRedirect("/index.jsp");
+    }
+%>
 <!--
 	TODO: 4.16. Design the "Create Post" page with the following properties.
 	    1. Title of the page should be "Create Post"
@@ -40,3 +49,45 @@
     on this web page. For example, if email id is example@gmail.com, then display "Logged In as example"
     in the top left corner of the web page as shown on the learn platform.
 -->
+
+<html>
+       <head>
+            <title>Home Page</title>
+       </head>
+       <body>
+            <%
+                try {
+                    String email[] = session.getAttribute("userEmail").toString().split("@");
+                    out.println("Logged In as " + email[0]);
+                    } catch(NullPointerException ex) {
+                }
+            %>
+            <br><br>
+            <form method="POST" action="/ublog/post">
+                <table>
+                    <tr>
+                        <td><label for="userEmail">User Email:</label></td>
+                        <td><% out.println(" " + session.getAttribute("userEmail")); %></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="blogTitle">Blog Title :</label></td>
+                        <td><input type="text" placeholder="Title" required name="blogTitle" maxlength="200"/></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="blogTag">Blog Tag :</label></td>
+                        <td><input type="text" placeholder="java" required name="blogTag" maxlength="10"/></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="blogDescription">Blog Description :</label></td>
+                        <td><textarea id="blogDescription" name="blogDescription" maxlength="1000" rows="15" cols="75" placeholder="Post Description" required></textarea></td>
+                    </tr>
+                </table>
+
+                <input type="submit" value="Post" name="actionType"/>
+            </form>
+            <a href="/Home.jsp">Home Page </a>
+       </body>
+</html>

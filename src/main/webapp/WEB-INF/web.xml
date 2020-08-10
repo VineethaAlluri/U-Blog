@@ -10,6 +10,36 @@
     TODO: 4.3. Map the “PostUtilServlet” Servlet to “/ublog/post/util”
   -->
 
+  <servlet>
+    <servlet-name>UserServlet</servlet-name>
+    <servlet-class>com.upgrad.ublog.servlets.UserServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>UserServlet</servlet-name>
+    <url-pattern>/ublog/user</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PostServlet</servlet-name>
+    <servlet-class>com.upgrad.ublog.servlets.PostServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>PostServlet</servlet-name>
+    <url-pattern>/ublog/post</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PostUtilServlet</servlet-name>
+    <servlet-class>com.upgrad.ublog.servlets.PostUtilServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>PostUtilServlet</servlet-name>
+    <url-pattern>/ublog/post/util</url-pattern>
+  </servlet-mapping>
+
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>

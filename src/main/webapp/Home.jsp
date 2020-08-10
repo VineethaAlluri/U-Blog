@@ -13,7 +13,16 @@
 	(Hint: You need to handle NullPointerException.)
 	(Hint: Make use of the email id stored in the session object to check if user is logged in or not.)
 -->
+<%
+    try {
 
+        if(session.getAttribute("userEmail") == null) {
+                    response.sendRedirect("/index.jsp");
+                }
+    } catch(NullPointerException ex) {
+        response.sendRedirect("/index.jsp");
+    }
+%>
 <!--
 	TODO: 4.14. Design the "Home" page with the following properties.
 	    1. Title of the page should be "Home Page"
@@ -24,3 +33,34 @@
 	        and Logout.jsp page. They should be provided in the same order as shown on the learn platform with
 	        some spacing between them.
 -->
+<html>
+    <head>
+        <title>Home Page</title>
+    </head>
+    <body>
+        <%
+            try {
+            String email[] = session.getAttribute("userEmail").toString().split("@");
+            out.println("Logged In as " + email[0]);
+            } catch(NullPointerException ex) {
+            }
+        %>
+        <br><br>
+
+        <a href="/ublog/Create.jsp">Create Post </a>
+        <br><br>
+
+        <a href="/ublog/Delete.jsp">Delete Post </a>
+        <br><br>
+
+        <a href="/ublog/Filter.jsp">Filter Post </a>
+        <br><br>
+
+        <a href="/ublog/Search.jsp">Search Post </a>
+        <br><br>
+
+        <a href="/Logout.jsp">Logout</a>
+
+    </body>
+ </html>
+

@@ -5,3 +5,5 @@
     Home.jsp is clicked, the session is invalidated and user is redirected to the
     Sign In/ Sign Up page.
 -->
+<% session.setAttribute("userEmail", false);
+   response.sendRedirect("/index.jsp"); %>

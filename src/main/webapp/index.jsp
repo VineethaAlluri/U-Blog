@@ -28,6 +28,38 @@
         7. Use the table tag to align the labels and text fields.
         8. Provide "Sign In" and "Sign Up" submit buttons.
 -->
+<html>
+<head>
+    <title>Sign In / Sign Up</title>
+</head>
+
+<body>
+<form method="POST" action="/ublog/user">
+    <table>
+        <tr>
+            <td><label for="userEmail">User Email:</label></td>
+            <td><input type="text" placeholder="example@email.com" required name="userEmail" id="userEmail"/></td>
+        </tr>
+
+        <tr>
+            <td><label for="password">Password:</label></td>
+            <td><input type="password" placeholder="********" required name="password" id="password"/></td>
+        </tr>
+    </table>
+
+    <input type="submit" value="Sign In" name="actionType"/>
+    <input type="submit" value="Sign Up" name="actionType"/>
+    <%
+    try {
+        if((Boolean)request.getAttribute("isError")) {
+            out.println((String)request.getAttribute("errorMessage"));
+        }
+    } catch(NullPointerException e) {
+    }
+    %>
+</form>
+</body>
+</html>
 
 <!--
     TODO: 4.12. Write the Java code to display the error message present in the request object. The
