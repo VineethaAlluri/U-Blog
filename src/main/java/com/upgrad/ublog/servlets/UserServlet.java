@@ -29,7 +29,11 @@ package com.upgrad.ublog.servlets;
  * TODO: 5.6: Remove the same mapping from the Deployment Descriptor otherwise, you will get an error.
  */
 
+import com.upgrad.ublog.exceptions.EmailNotValidException;
+import com.upgrad.ublog.utils.EmailValidator;
+
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +64,7 @@ import java.util.Enumeration;
  *  TODO 6.18: If UserService is not able to process the request and throws an exception, get the
  *   message stored in the exception object and display the same message on the index.jsp page.
  */
-
+@WebServlet("/ublog/user")
 public class UserServlet extends HttpServlet {
 
     @Override
@@ -77,7 +81,14 @@ public class UserServlet extends HttpServlet {
         String actionType = req.getParameter("actionType");
         //resp.getWriter().println(userEmail);
 
-
+        try {
+            EmailValidator.isValidEmail(userEmail);
+        } catch(EmailNotValidException ex) {
+            req.setAttribute("isError",true);
+            req.setAttribute("errorMessage",ex.getMessage());
+            req.getRequestDispatcher("/index.jsp").forward(req,resp);
+            return;
+        }
         if(password==null|| password.isEmpty()) {
             req.setAttribute("isError",true);
             req.setAttribute("errorMessage","Password is a required field");
@@ -87,11 +98,13 @@ public class UserServlet extends HttpServlet {
 
         if(actionType.equals("Sign In")) {
             httpSession.setAttribute("userEmail",userEmail);
-            resp.getWriter().println(userEmail);
+            resp.getWriter().println("User Signed In");
+            resp.getWriter().println("userEmail " + userEmail);
             //print details
         } else {
             httpSession.setAttribute("userEmail",userEmail);
-            resp.getWriter().println(userEmail);
+            resp.getWriter().println("User Signed Up");
+            resp.getWriter().println("userEmail " + userEmail);
             //print details
         }
     }
