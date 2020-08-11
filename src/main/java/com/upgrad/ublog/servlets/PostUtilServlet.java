@@ -42,22 +42,135 @@ package com.upgrad.ublog.servlets;
  *   to the request object.
  */
 
-import javax.servlet.http.HttpServlet;
+import com.upgrad.ublog.dto.PostDTO;
+import com.upgrad.ublog.exceptions.EmailNotValidException;
+import com.upgrad.ublog.exceptions.PostNotFoundException;
+import com.upgrad.ublog.services.PostService;
+import com.upgrad.ublog.services.ServiceFactory;
+import com.upgrad.ublog.utils.EmailValidator;
 
-/**
- * TODO: 7.29. If the request is coming from the Filter.jsp page, then do the following:
- *  1. Retrieve the tag from the request object.
- *  2. Fetch all the posts corresponding to the tag using the getPostsByTag() method of the PostService.
- *  3. If no post exists corresponding to the tag, then throw new PostNotFoundException with a message
- *   "Sorry no posts exists for this tag. This exception should be caught and the message should be
- *   passed to the Filter.jsp page, where it gets displayed to the user.
- *  4. If posts exist corresponding to the tag, then load the list of PostDTO objects into request
- *   object as an attribute and redirect to the Filter.jsp page.
- *  5. If some exception was thrown during the filtering of the post, such as PostNotFoundException, handle
- *   all those exceptions, pass the message stored in the exceptions to the Filter.jsp page as an attribute
- *   to the request object.
- */
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+
+
 
 public class PostUtilServlet extends HttpServlet {
+
+    PostService postService;
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession httpSession = req.getSession();
+        String userEmail= (String) httpSession.getAttribute("userEmail");
+
+        if (httpSession.getAttribute("userEmail") == null) {
+            resp.sendRedirect("/index.jsp");
+        }
+
+        // Search
+        String emailToBeSearched = req.getParameter("userEmailSearch");
+        boolean flag = false;
+        try {
+            flag = EmailValidator.isValidEmail(emailToBeSearched);
+        } catch(EmailNotValidException ex) {
+            req.setAttribute("isError",true);
+            req.setAttribute("errorMessage",ex.getMessage());
+            req.getRequestDispatcher("/ublog/Search.jsp").forward(req,resp);
+            return;
+        }
+        if(flag) {
+            try {
+                List<PostDTO> searchPosts = postService.getPostsByEmail(emailToBeSearched);
+                if(searchPosts.isEmpty()) {
+                    throw new PostNotFoundException("Sorry no posts exists for this email id");
+                }
+                else {
+                    req.setAttribute("PostFound", true);
+                    req.setAttribute("searchPostResults",searchPosts);
+                    req.getRequestDispatcher("/ublog/Search.jsp").forward(req,resp);
+                }
+            } catch(PostNotFoundException post) {
+                req.setAttribute("isError",true);
+                req.setAttribute("errorMessage",post.getMessage());
+                req.getRequestDispatcher("/ublog/Search.jsp").forward(req,resp);
+                return;
+            }
+            catch(Exception ex) {
+                req.setAttribute("isError",true);
+                req.setAttribute("errorMessage",ex.getMessage());
+                req.getRequestDispatcher("/ublog/Search.jsp").forward(req,resp);
+                return;
+            }
+        }
+
+
+        //delete
+        String idToBeDeleted = req.getParameter("deleteId");
+        int idForDelete = Integer.parseInt(idToBeDeleted);
+        try {
+            boolean deleteSuccessful = postService.deletePost(idForDelete, userEmail);
+            if(deleteSuccessful) {
+                req.setAttribute("postDeletionStatus",true);
+                req.setAttribute("normalMessage","Post deleted successfully!");
+                req.getRequestDispatcher("/ublog/Delete.jsp").forward(req,resp);
+            }
+            else {
+                req.setAttribute("postDeletionStatus",true);
+                req.setAttribute("normalMessage","You are not authorised to delete this post");
+                req.getRequestDispatcher("/ublog/Delete.jsp").forward(req,resp);
+            }
+        } catch(Exception ex) {
+            req.setAttribute("isError",true);
+            req.setAttribute("errorMessage",ex.getMessage());
+            req.getRequestDispatcher("/ublog/Delete.jsp").forward(req,resp);
+            return;
+        }
+
+        /**
+         * TODO: 7.29. If the request is coming from the Filter.jsp page, then do the following:
+         *  1. Retrieve the tag from the request object.
+         *  2. Fetch all the posts corresponding to the tag using the getPostsByTag() method of the PostService.
+         *  3. If no post exists corresponding to the tag, then throw new PostNotFoundException with a message
+         *   "Sorry no posts exists for this tag. This exception should be caught and the message should be
+         *   passed to the Filter.jsp page, where it gets displayed to the user.
+         *  4. If posts exist corresponding to the tag, then load the list of PostDTO objects into request
+         *   object as an attribute and redirect to the Filter.jsp page.
+         *  5. If some exception was thrown during the filtering of the post, such as PostNotFoundException, handle
+         *   all those exceptions, pass the message stored in the exceptions to the Filter.jsp page as an attribute
+         *   to the request object.
+         */
+
+        //filter
+        String tag = req.getParameter("selectTag");
+        try {
+            List<PostDTO> postDTOList = postService.getPostsByTag(tag);
+            if(postDTOList.isEmpty()) {
+                throw new PostNotFoundException("Sorry no posts exists for this tag");
+            }
+            else {
+                req.setAttribute("PostFound", true);
+                req.setAttribute("searchPostResults",postDTOList);
+                req.getRequestDispatcher("/ublog/Filter.jsp").forward(req,resp);
+            }
+        } catch(Exception ex) {
+            req.setAttribute("isError",true);
+            req.setAttribute("errorMessage",ex.getMessage());
+            req.getRequestDispatcher("/ublog/Filter.jsp").forward(req,resp);
+            return;
+        }
+
+    }
+
+    @Override
+    public void init() throws ServletException {
+        ServiceFactory serviceFactory = new ServiceFactory();
+        postService = serviceFactory.createPostService();
+    }
 
 }

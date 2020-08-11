@@ -13,7 +13,16 @@
 	(Hint: You need to handle NullPointerException.)
 	(Hint: Make use of the email id stored in the session object to check if user is logged in or not.)
 -->
+<%
+    try {
 
+        if(session.getAttribute("userEmail") == null) {
+                    response.sendRedirect("/index.jsp");
+                }
+    } catch(NullPointerException ex) {
+        response.sendRedirect("/index.jsp");
+    }
+%>
 <!--
 	TODO: 7.17. Design the "Delete Post" page with the following properties.
 	    1. Title of the page should be "Delete Post"
@@ -38,3 +47,47 @@
     TODO: 7.21. Check if there exists a normal message in the request object. If so, then display the message
     below the Delete button.
 -->
+
+<html>
+       <head>
+            <title>Delete Post</title>
+       </head>
+       <body>
+            <%
+                try {
+                    String email[] = session.getAttribute("userEmail").toString().split("@");
+                    out.println("Logged In as " + email[0]);
+                    } catch(NullPointerException ex) {
+                }
+            %>
+            <br><br>
+            <form method="POST" action="/ublog/post/util">
+                <table>
+                    <tr>
+                        <td><label for="deleteId">Post Id :</label></td>
+                        <td><input type="number" placeholder="post Id" required name="deleteId" /></td>
+                    </tr>
+                    <tr>
+                    <td><input type="submit" value="Delete" name="actionType"/></td>
+                    </tr>
+                </table>
+
+            </form>
+            <a href="/Home.jsp">Home Page </a>
+            <br><br>
+                <%
+                try {
+                    if((Boolean)request.getAttribute("isError")) {
+                        out.println((String)request.getAttribute("errorMessage"));
+                    }
+                } catch(NullPointerException e) {
+                }
+                try {
+                    if((Boolean)request.getAttribute("postDeletionStatus")) {
+                        out.println((String)request.getAttribute("normalMessage"));
+                    }
+                } catch(NullPointerException e) {
+                }
+                %>
+       </body>
+</html>

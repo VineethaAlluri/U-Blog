@@ -37,6 +37,8 @@ import com.upgrad.ublog.db.DatabaseConnection;
 import com.upgrad.ublog.dto.PostDTO;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,12 +60,44 @@ public class PostDAOImpl implements PostDAO{
 
     @Override
     public List<PostDTO> findByEmail(String emailId) throws SQLException {
-        return null;
+        List<PostDTO> postDTOS = new ArrayList<>();
+        Connection connection = DatabaseConnection.getConnection();
+        String query = "SELECT * FROM UBLOG_POSTS WHERE email_id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, emailId);
+        ResultSet resultSet = statement.executeQuery();
+        PostDTO postDTO = new PostDTO();
+        while(resultSet.next()) {
+            postDTO.setPostId(resultSet.getInt("id"));
+            postDTO.setTimestamp((LocalDateTime) resultSet.getObject("timestamp"));
+            postDTO.setTitle(resultSet.getString("title"));
+            postDTO.setTag(resultSet.getString("tag"));
+            postDTO.setDescription(resultSet.getString("description"));
+            postDTO.setEmailId(resultSet.getString("email_id"));
+            postDTOS.add(postDTO);
+        }
+        return postDTOS;
     }
 
     @Override
     public List<PostDTO> findByTag(String tag) throws SQLException {
-        return null;
+        List<PostDTO> postDTOS = new ArrayList<>();
+        Connection connection = DatabaseConnection.getConnection();
+        String query = "SELECT * FROM UBLOG_POSTS WHERE tag = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, tag);
+        ResultSet resultSet = statement.executeQuery();
+        PostDTO postDTO = new PostDTO();
+        while(resultSet.next()) {
+            postDTO.setPostId(resultSet.getInt("id"));
+            postDTO.setTimestamp((LocalDateTime) resultSet.getObject("timestamp"));
+            postDTO.setTitle(resultSet.getString("title"));
+            postDTO.setTag(resultSet.getString("tag"));
+            postDTO.setDescription(resultSet.getString("description"));
+            postDTO.setEmailId(resultSet.getString("email_id"));
+            postDTOS.add(postDTO);
+        }
+        return postDTOS;
     }
 
     @Override
@@ -88,16 +122,54 @@ public class PostDAOImpl implements PostDAO{
 
     @Override
     public List<String> findAllTags() throws SQLException {
-        return null;
+        try {
+            List<String> tags = new ArrayList<>();
+            Connection connection = DatabaseConnection.getConnection();
+            String query = "SELECT tag FROM UBLOG_POSTS ";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                tags.add(resultSet.getString("tag"));
+            }
+            return tags;
+        } catch(SQLException ex) {
+            throw new SQLException(ex);
+        }
     }
 
     @Override
     public PostDTO findById(int id) throws SQLException {
-        return null;
+        Connection connection = DatabaseConnection.getConnection();
+        String query = "SELECT * FROM UBLOG_POSTS WHERE id = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        PostDTO postDTO = new PostDTO();
+        while(resultSet.next()) {
+            postDTO.setPostId(resultSet.getInt("id"));
+            postDTO.setTimestamp((LocalDateTime) resultSet.getObject("timestamp"));
+            postDTO.setTitle(resultSet.getString("title"));
+            postDTO.setTag(resultSet.getString("tag"));
+            postDTO.setDescription(resultSet.getString("description"));
+            postDTO.setEmailId(resultSet.getString("email_id"));
+
+        }
+        return postDTO;
     }
 
     @Override
     public boolean deleteById(int id) throws SQLException {
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            String query = "DELETE FROM UBLOG_POSTS WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            int count = statement.executeUpdate();
+            if (count == 1)
+                return true;
+        } catch(SQLException ex) {
+            throw new SQLException(ex);
+        }
         return false;
     }
 }

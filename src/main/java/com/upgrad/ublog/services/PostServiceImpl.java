@@ -55,8 +55,12 @@ package com.upgrad.ublog.services;
 
 import com.upgrad.ublog.dao.DAOFactory;
 import com.upgrad.ublog.dao.PostDAO;
+import com.upgrad.ublog.db.DatabaseConnection;
 import com.upgrad.ublog.dto.PostDTO;
+import com.upgrad.ublog.exceptions.PostNotFoundException;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
@@ -94,21 +98,48 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public List<PostDTO> getPostsByEmail(String emailId) throws Exception {
-        return null;
+        try {
+            return postDAO.findByEmail(emailId);
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+            throw new Exception("Some unexpected error occurred!");
+        }
     }
 
     @Override
     public List<PostDTO> getPostsByTag(String tag) throws Exception {
-        return null;
+        try {
+            return postDAO.findByTag(tag);
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+            throw new Exception("Some unexpected error occurred!");
+        }
     }
 
     @Override
     public Set<String> getAllTags() throws Exception {
-        return null;
+        try {
+            Set<String> allTags = (Set<String>)postDAO.findAllTags();
+            return allTags;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+            throw new Exception("Some unexpected error occurred!");
+        }
     }
 
     @Override
     public boolean deletePost(int id, String emailId) throws Exception {
-        return false;
+        try {
+            PostDTO postDTO = postDAO.findById(id);
+            if (postDTO == null)
+                throw new PostNotFoundException("No Post exist with the given Post Id");
+            else if (postDTO.getEmailId().equals(emailId))
+                return postDAO.deleteById(id);
+            else
+                return false;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new Exception("Some unexpected error occurred!");
+        }
     }
 }

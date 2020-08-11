@@ -16,7 +16,16 @@
 	(Hint: You need to handle NullPointerException.)
 	(Hint: Make use of the email id stored in the session object to check if user is logged in or not.)
 -->
+<%
+    try {
 
+        if(session.getAttribute("userEmail") == null) {
+                    response.sendRedirect("/index.jsp");
+                }
+    } catch(NullPointerException ex) {
+        response.sendRedirect("/index.jsp");
+    }
+%>
 <!--
 	TODO: 7.4. Design the "Search Post" page with the following properties.
 	    1. Title of the page should be "Search Post"
@@ -43,3 +52,78 @@
      Note: Use the table tag to align the fields.
      Note: Try to provide a horizontal rule or some spacing between the posts as shown on the learn platform.
 -->
+
+<html>
+       <head>
+            <title>Search Post</title>
+       </head>
+       <body>
+            <%
+                try {
+                    String email[] = session.getAttribute("userEmail").toString().split("@");
+                    out.println("Logged In as " + email[0]);
+                    } catch(NullPointerException ex) {
+                }
+            %>
+            <br><br>
+            <form method="POST" action="/ublog/post/util">
+                <table>
+                    <tr>
+                        <td><label for="userEmailSearch">User Email:</label></td>
+                        <td><input type="email" placeholder="example@email.com" required name="userEmailSearch" /></td>
+                    </tr>
+                    <tr>
+                    <td><input type="submit" value="Search" name="actionType"/></td>
+                    </tr>
+                </table>
+
+            </form>
+            <a href="/Home.jsp">Home Page </a>
+            <br><br>
+                <%
+                try {
+                    if((Boolean)request.getAttribute("isError")) {
+                        out.println((String)request.getAttribute("errorMessage"));
+                    }
+                } catch(NullPointerException e) {
+                }
+                %>
+                <table>
+                <%
+                try{
+                    if((Boolean)request.getAttribute("PostFound")) {
+                    List<PostDTO> list = request.getAttribute("searchPostResults");
+                    for(int i=0; i<list.size() ;i++ )  { %>
+                    <tr>
+                    <td><label for="postId">Post Id :</label></td>
+                    <td><% out.println(list.get(i).getPostId()); %></td>
+                    </tr>
+                    <tr>
+                    <td><label for="userEmail">User Email:</label></td>
+                    <td><% out.println(list.get(i).getEmailId()); %></td>
+                    </tr>
+                    <tr>
+                    <td><label for="title">Title :</label></td>
+                    <td><% out.println(list.get(i).getTitle()); %></td>
+                    </tr>
+                    <tr>
+                    <td><label for="tag">Tag :</label></td>
+                    <td><% out.println(list.get(i).getTag()); %></td>
+                    </tr>
+                    <tr>
+                    <td><label for="desc">Description :</label></td>
+                    <td><% out.println(list.get(i).getDescription()); %></td>
+                    </tr>
+                    <tr>
+                    <td><label for="time">User Email:</label></td>
+                    <td><% out.println(list.get(i).getTimestamp()); %></td>
+                    </tr>
+                    <tr>
+                    <td><hr></td>
+                    <td><hr></td>
+                    </tr>
+                    <% }
+                %>
+                </table>
+       </body>
+</html>
