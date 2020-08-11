@@ -29,7 +29,11 @@ package com.upgrad.ublog.servlets;
  * TODO: 5.6: Remove the same mapping from the Deployment Descriptor otherwise, you will get an error.
  */
 
+import com.upgrad.ublog.db.DatabaseConnection;
+import com.upgrad.ublog.dto.UserDTO;
 import com.upgrad.ublog.exceptions.EmailNotValidException;
+import com.upgrad.ublog.services.ServiceFactory;
+import com.upgrad.ublog.services.UserService;
 import com.upgrad.ublog.utils.EmailValidator;
 
 import javax.servlet.ServletException;
@@ -39,6 +43,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Enumeration;
 
 /**
@@ -67,9 +75,10 @@ import java.util.Enumeration;
 @WebServlet("/ublog/user")
 public class UserServlet extends HttpServlet {
 
+    UserService userService;
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         HttpSession httpSession = req.getSession();
 
         if(httpSession.getAttribute("userEmail") != null) {
@@ -96,16 +105,90 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
+// Sign In Part
+
         if(actionType.equals("Sign In")) {
             httpSession.setAttribute("userEmail",userEmail);
             resp.getWriter().println("User Signed In");
             resp.getWriter().println("userEmail " + userEmail);
-            //print details
-        } else {
+            boolean regEmail = true;
+            boolean valid = true;
+            try {
+                Connection connection=DatabaseConnection.getConnection();
+                String emailRegisteredQuery = "SELECT * FROM UBLOG_USERS WHERE email_id = ?";
+                PreparedStatement statement = connection.prepareStatement(emailRegisteredQuery);
+                statement.setString(1,userEmail);
+                ResultSet resultSet = statement.executeQuery();
+                regEmail = resultSet.next();
+                String validLogin ="SELECT * FROM UBLOG_USERS WHERE email_id = ? and password = ?";
+                statement = connection.prepareStatement(validLogin);
+                statement.setString(1,userEmail);
+                statement.setString(2,password);
+                resultSet = statement.executeQuery();
+                valid = resultSet.next();
+            } catch(SQLException ex) {}
+            if(!regEmail) {
+                req.setAttribute("isError",true);
+                req.setAttribute("errorMessage","No user registered with the given email address!");
+                req.getRequestDispatcher("/index.jsp").forward(req,resp);
+                return;
+            }
+            else if(!valid) {
+                req.setAttribute("isError",true);
+                req.setAttribute("errorMessage","Please enter valid credentials");
+                req.getRequestDispatcher("/index.jsp").forward(req,resp);
+                return;
+            }
+            else {
+                httpSession.setAttribute("userEmail",userEmail);
+                req.getRequestDispatcher("/Home.jsp").forward(req,resp);
+                return;
+            }
+
+        }
+//Sign Up Part
+
+        else {
             httpSession.setAttribute("userEmail",userEmail);
             resp.getWriter().println("User Signed Up");
             resp.getWriter().println("userEmail " + userEmail);
-            //print details
+            try {
+                Connection connection=DatabaseConnection.getConnection();
+                String emailRegisteredQuery = "SELECT * FROM UBLOG_USERS WHERE email_id = ?";
+                PreparedStatement statement = connection.prepareStatement(emailRegisteredQuery);
+                statement.setString(1,userEmail);
+                ResultSet resultSet = statement.executeQuery();
+                boolean regEmail = resultSet.next();
+                if(!regEmail) {
+                    String query = "INSERT INTO UBLOG_USERS(id, email_id, password) VALUES (?,?,?)";
+                    statement = connection.prepareStatement(query);
+                    statement.setInt(1,1);
+                    statement.setString(2,userEmail);
+                    statement.setString(3,password);
+                    statement.executeUpdate();
+                    req.getRequestDispatcher("/Home.jsp").forward(req,resp);
+                }
+                else {
+                    req.setAttribute("isError",true);
+                    req.setAttribute("errorMessage","A user with this email address already exists!");
+                    req.getRequestDispatcher("/index.jsp").forward(req,resp);
+                    return;
+                }
+            }
+            catch(Exception ex) {
+                req.setAttribute("isError",true);
+                req.setAttribute("errorMessage",ex.getMessage());
+                req.getRequestDispatcher("/index.jsp").forward(req,resp);
+                return;
+            }
         }
     }
+
+    @Override
+    public void init() throws ServletException {
+        ServiceFactory serviceFactory = new ServiceFactory();
+        userService = serviceFactory.createUserService();
+    }
+
+
 }

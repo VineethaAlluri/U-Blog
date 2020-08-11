@@ -11,4 +11,11 @@ package com.upgrad.ublog.services;
 
 public class ServiceFactory {
 
+    public PostService createPostService() {
+        return PostServiceImpl.getInstance();
+    }
+
+    public UserService createUserService() {
+        return UserServiceImpl.getInstance();
+    }
 }

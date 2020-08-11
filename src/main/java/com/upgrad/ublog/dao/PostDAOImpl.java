@@ -33,6 +33,12 @@ package com.upgrad.ublog.dao;
  *  without setting any of its attributes.
  */
 
+import com.upgrad.ublog.db.DatabaseConnection;
+import com.upgrad.ublog.dto.PostDTO;
+
+import java.sql.*;
+import java.util.List;
+
 /**
  * TODO: 7.22. Implement findAllTags() method which returns a list of all unique tags in the UBLOG_POSTS
  *  table.
@@ -40,6 +46,58 @@ package com.upgrad.ublog.dao;
  *  posts corresponding to the input "tag" from the UBLOG_POSTS table defined in the database.
  */
 
-public class PostDAOImpl {
+public class PostDAOImpl implements PostDAO{
 
+    private PostDAOImpl() {}
+
+    private static PostDAOImpl instance;
+
+    public static PostDAOImpl getInstance() {
+        return instance;
+    }
+
+    @Override
+    public List<PostDTO> findByEmail(String emailId) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public List<PostDTO> findByTag(String tag) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public PostDTO create(PostDTO postDTO) throws SQLException {
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            String query = "INSERT INTO UBLOG_POSTS(id, email_id, title, description, tag, timestamp)" + "VALUES (?,?,?,?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            Timestamp timestamp = Timestamp.valueOf(postDTO.getTimestamp());
+            statement.setInt(1, postDTO.getPostId());
+            statement.setString(2, postDTO.getEmailId());
+            statement.setString(3, postDTO.getTitle());
+            statement.setString(4, postDTO.getDescription());
+            statement.setString(5, postDTO.getTag());
+            statement.setTimestamp(6, timestamp);
+            statement.executeUpdate();
+            return postDTO;
+        } catch(SQLException ex) {
+            throw new SQLException(ex);
+        }
+    }
+
+    @Override
+    public List<String> findAllTags() throws SQLException {
+        return null;
+    }
+
+    @Override
+    public PostDTO findById(int id) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public boolean deleteById(int id) throws SQLException {
+        return false;
+    }
 }

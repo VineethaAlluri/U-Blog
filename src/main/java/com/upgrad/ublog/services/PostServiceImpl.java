@@ -53,6 +53,14 @@ package com.upgrad.ublog.services;
  *  with a message "Some unexpected error occurred!"
  */
 
+import com.upgrad.ublog.dao.DAOFactory;
+import com.upgrad.ublog.dao.PostDAO;
+import com.upgrad.ublog.dto.PostDTO;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * TODO: 7.25. Implement getPostsByTag() method which takes tag as an input parameter and
  *  returns all the posts corresponding to the tag using the findByTag() method of PostDAO interface.
@@ -61,6 +69,46 @@ package com.upgrad.ublog.services;
  *  with a message "Some unexpected error occurred!"
  */
 
-public class PostServiceImpl {
+public class PostServiceImpl implements PostService{
 
+    private PostServiceImpl() {}
+
+    private static PostServiceImpl instance;
+
+    public static PostServiceImpl getInstance() {
+        return instance;
+    }
+
+    DAOFactory daoFactory = new DAOFactory();
+    PostDAO postDAO = daoFactory.createPostDAO();
+
+    @Override
+    public PostDTO save(PostDTO postDTO) throws Exception {
+        try {
+            return postDAO.create(postDTO);
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+            throw new Exception("Some unexpected error occurred!");
+        }
+    }
+
+    @Override
+    public List<PostDTO> getPostsByEmail(String emailId) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<PostDTO> getPostsByTag(String tag) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Set<String> getAllTags() throws Exception {
+        return null;
+    }
+
+    @Override
+    public boolean deletePost(int id, String emailId) throws Exception {
+        return false;
+    }
 }

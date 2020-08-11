@@ -41,6 +41,8 @@ package com.upgrad.ublog.servlets;
  */
 
 import com.upgrad.ublog.dto.PostDTO;
+import com.upgrad.ublog.services.PostService;
+import com.upgrad.ublog.services.ServiceFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -49,6 +51,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 /**
@@ -59,6 +62,8 @@ import java.time.LocalDateTime;
  */
 @WebServlet("/ublog/post")
 public class PostServlet extends HttpServlet {
+
+    PostService postService;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -81,8 +86,19 @@ public class PostServlet extends HttpServlet {
         req.setAttribute("postDTO", postDTO);
         PostDTO dto = (PostDTO) req.getAttribute("postDTO");
         System.out.println(dto.getTitle());
+        try {
+            postService.save(dto);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
         req.getRequestDispatcher("/ublog/View.jsp").forward(req,resp);
 
+    }
+
+    @Override
+    public void init() throws ServletException {
+        ServiceFactory serviceFactory = new ServiceFactory();
+        postService = serviceFactory.createPostService();
     }
 
 }

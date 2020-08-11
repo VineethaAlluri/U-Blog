@@ -45,10 +45,13 @@
             <td><label for="password">Password:</label></td>
             <td><input type="password" placeholder="********" required name="password" id="password"/></td>
         </tr>
-    </table>
+        <tr>
 
-    <input type="submit" value="Sign In" name="actionType"/>
-    <input type="submit" value="Sign Up" name="actionType"/>
+            <td><input type="submit" value="Sign In" name="actionType"/></td>
+            <td><input type="submit" value="Sign Up" name="actionType"/></td>
+        </tr>
+        </table>
+        <br><br>
     <%
     try {
         if((Boolean)request.getAttribute("isError")) {
@@ -57,6 +60,7 @@
     } catch(NullPointerException e) {
     }
     %>
+
 </form>
 </body>
 </html>
