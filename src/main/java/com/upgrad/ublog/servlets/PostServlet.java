@@ -40,9 +40,12 @@ package com.upgrad.ublog.servlets;
  *  Print the "System.getProperty("user.dir")" to know where the log file is created.
  */
 
+import com.upgrad.ublog.db.DatabaseConnection;
 import com.upgrad.ublog.dto.PostDTO;
 import com.upgrad.ublog.services.PostService;
 import com.upgrad.ublog.services.ServiceFactory;
+import com.upgrad.ublog.utils.DateTimeFormatter;
+import com.upgrad.ublog.utils.LogWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -91,6 +94,10 @@ public class PostServlet extends HttpServlet {
         } catch(Exception ex) {
             ex.printStackTrace();
         }
+        String path = System.getProperty("user.dir");
+        String message = DateTimeFormatter.format(postDTO.getTimestamp()) + "   New post with title " +
+                postDTO.getTitle() + " created by " + postDTO.getEmailId();
+        LogWriter.writeLog(message,path);
         req.getRequestDispatcher("/ublog/View.jsp").forward(req,resp);
 
     }
